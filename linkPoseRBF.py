@@ -214,12 +214,12 @@ class LinkPoseRBF(om2.MPxNode):
         return True
         
         
-    def getPoseActivations(self, driverVec:list, kernelType:int=1) -> list:
+    def getPoseActivations(self, driverVec:list) -> list:
         rbfActivations = []
         
         for posepos in self.poseInNMatrixs:
             distance = LinkPoseRBF.getDistance(driverVec, posepos)
-            rbfVal   = LinkPoseRBF.calculateKernel(distance, self.radius, kernelType)
+            rbfVal   = LinkPoseRBF.calculateKernel(distance, self.radius, self.kernelType)
             rbfActivations.append(rbfVal)
         
         return LinkPoseRBF.multMatrix([rbfActivations], self.solvedWeights)[0]
@@ -289,7 +289,7 @@ class LinkPoseRBF(om2.MPxNode):
                 driverVec[logicalIndex] = dInHandle.inputValue().asDouble()
                 
         # 3 get activations
-        finalOutputVec:list = self.getPoseActivations(driverVec, self.kernelType)
+        finalOutputVec:list = self.getPoseActivations(driverVec)
         
         # 4 check norm state
         if dataBlock.inputValue(self.NORMAL_OUTPUTS).asBool():
@@ -426,3 +426,4 @@ def uninitializePlugin(plugin:om2.MObject):
         plugFn.deregisterNode(LinkPoseRBF.Type_ID)
     except:
         om2.MGlobal.displayError(f'Failed to register node: {LinkPoseRBF.TYPE_NAME}')
+
